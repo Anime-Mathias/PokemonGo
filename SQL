@@ -1,0 +1,193 @@
+DROP TABLE Apparition;
+DROP TABLE Defense;
+DROP TABLE Arene;
+DROP TABLE Emplacement;
+DROP TABLE Pokemon;
+DROP TABLE Joueur;
+DROP TABLE Equipe;
+
+
+CREATE TABLE Equipe (
+	id INT PRIMARY KEY,
+	nom CHAR(20),
+	couleur CHAR(15)
+);
+
+CREATE TABLE Joueur (
+        pseudonyme CHAR(20) PRIMARY KEY,
+        personnage CHAR(20),
+        sexe CHAR(1),
+        niveau INT,
+        idEquipe INT,
+        FOREIGN KEY (idEquipe) REFERENCES Equipe(id)
+);
+
+CREATE TABLE Pokemon (
+        id INT PRIMARY KEY,
+        nom CHAR(20),
+        espece CHAR(20),
+        pointCombat INT,
+        idJoueur CHAR(20),
+        FOREIGN KEY (idJoueur) REFERENCES Joueur(pseudonyme)
+);
+
+CREATE TABLE Emplacement (
+        id INT PRIMARY KEY,
+        latitude FLOAT,
+        longitude FLOAT
+);
+
+CREATE TABLE Arene (
+        id INT PRIMARY KEY,
+        nom CHAR(20),
+        idEmplacement INT,
+        FOREIGN KEY (idEmplacement) REFERENCES Emplacement(id)
+);
+
+CREATE TABLE Defense (
+        idEquipe INT,
+        idArene INT,
+        dateControle DATE,
+        FOREIGN KEY (idEquipe) REFERENCES Equipe(id),
+        FOREIGN KEY (idArene) REFERENCES Arene(id)
+);
+
+CREATE TABLE Apparition(
+        idPokemon INT,
+        idEmplacement INT,
+        horaire DATE,
+        duree INT,
+        FOREIGN KEY (idPokemon) REFERENCES Pokemon(id),
+        FOREIGN KEY (idEmplacement) REFERENCES Emplacement(id)
+);
+
+
+--------- Insertion de données dans Equipe------------
+
+INSERT INTO Equipe VALUES ('1','Intuition','Jaune');
+INSERT INTO Equipe VALUES ('2','Sagesse','Bleu');
+INSERT INTO Equipe VALUES ('3','Bravoure','Rouge');
+
+        --------- Insertion de données dans Joueur------------
+
+INSERT INTO Joueur VALUES ('Shadow','Smith','F','15','1');
+INSERT INTO Joueur VALUES ('Root','Alice','F','15','2');
+INSERT INTO Joueur VALUES ('Admin','Bob','M','1','1');
+
+
+--------- Insertion de données dans Pokemon------------
+
+INSERT INTO Pokemon VALUES ('1','Bulbizarre','Graine','1071','Shadow');
+INSERT INTO Pokemon VALUES ('25','Pikachu','Souris','887','Root');
+INSERT INTO Pokemon VALUES ('107','Tygnon','Puncheur','204','Shadow');
+INSERT INTO Pokemon VALUES ('103','Noadkoko','Fruitpalme','190','Admin');
+INSERT INTO Pokemon VALUES ('150','Mewtwo','Génétique','4144','Root');
+
+
+
+--------- Insertion de données dans Emplacement------------
+
+INSERT INTO Emplacement VALUES ('1','49.0350369','2.0696998');
+INSERT INTO Emplacement VALUES ('2','48.857848','2.295253');
+INSERT INTO Emplacement VALUES ('3','-74.0445','40.6892');
+
+--------- Insertion de données dans Arene------------
+
+INSERT INTO Arene VALUES ('1','Liberte','3');
+INSERT INTO Arene VALUES ('2','Lune','1');
+INSERT INTO Arene VALUES ('3','Star','2');
+
+--------- Insertion de données dans Defense------------
+
+INSERT INTO Defense VALUES ('1','1',TO_DATE('2016-10-10', 'yyyy-mm-dd'));
+INSERT INTO Defense VALUES ('1','2',TO_DATE('2016-09-01', 'yyyy-mm-dd'));
+
+--------- Insertion de données dans Apparition------------
+
+INSERT INTO Apparition VALUES ('1','2',TO_DATE('2016-10-09','yyyy-mm-dd'),'10');
+INSERT INTO Apparition VALUES ('25','1',TO_DATE('2016-09-01','yyyy-mm-dd'),'20');
+INSERT INTO Apparition VALUES ('107','3',TO_DATE('2016-10-02','yyyy-mm-dd'),'5');
+INSERT INTO Apparition VALUES ('103','1',TO_DATE('2016-10-25','yyyy-mm-dd'),'15');
+INSERT INTO Apparition VALUES ('25','3',TO_DATE('2016-10-25','yyyy-mm-dd'),'3');
+
+-------------------- Question 3 --------------------
+INSERT INTO Pokemon VALUES ('19','Rattata','Souris','20','Admin');
+INSERT INTO Pokemon VALUES ('39','Rondoudou','Bouboule','4145','Moustache');
+
+-------------------- Question 4 --------------------
+INSERT INTO Defense VALUES ('3','2',TO_DATE('2016-10-10', 'yyyy-mm-dd'));
+
+-------------------- Question 5 --------------------
+INSERT INTO Defense VALUES ('2','3','');
+
+-------------------- Question 6 --------------------
+INSERT INTO Joueur VALUES ('Flavius','Ruth','M','20','2');
+INSERT INTO Joueur VALUES ('Asterix','Ruth','M','5','1');
+
+-------------------- Question 7 --------------------
+UPDATE Joueur SET niveau = '15' WHERE sexe = 'F';
+
+-------------------- Question 8 --------------------
+DELETE FROM Pokemon WHERE espece LIKE '%Fruit%';
+
+-------------------- Question 9 --------------------
+DELETE FROM Joueur WHERE pseudonyme = 'Admin';
+
+-------------------- Question 10 --------------------
+SELECT id FROM Arene WHERE nom LIKE '%Lune%';
+
+-------------------- Question 11 --------------------
+SELECT id FROM Pokemon WHERE nom LIKE 'p%' OR nom LIKE 'P%'; 
+
+-------------------- Question 12 --------------------
+SELECT pseudonyme FROM Joueur WHERE pseudonyme NOT LIKE '%a%'; 
+
+-------------------- Question 13 --------------------
+SELECT id, nom, espece, pointCombat, idJoueur FROM Pokemon ORDER BY pointCombat DESC;
+
+-------------------- Question 14 --------------------
+SELECT AVG (duree) FROM Apparition;  
+
+-------------------- Question 15 --------------------
+SELECT COUNT(*) FROM Apparition WHERE horaire BETWEEN TO_DATE('2016-10-01', 'yyyy-mm-dd') AND TO_DATE('2016-10-31', 'yyyy-mm-dd');
+
+-------------------- Question 16 --------------------
+SELECT nom, espece FROM Pokemon WHERE espece = (SELECT espece FROM Pokemon WHERE nom ='Pikachu');
+
+-------------------- Question 17 --------------------
+SELECT AVG (niveau) FROM Joueur;
+SELECT pseudonyme, niveau FROM Joueur j1 WHERE j1.niveau > (SELECT AVG(j2.niveau) FROM Joueur j2);
+
+-------------------- Question 18 --------------------
+SELECT nom, pointCombat FROM Pokemon p1 WHERE p1.pointCombat = (SELECT MAX(p2.pointCombat) FROM Pokemon p2); 
+
+-------------------- Question 19 --------------------
+SELECT COUNT (idArene) FROM Defense WHERE idEquipe = (SELECT id FROM Equipe WHERE nom = 'Intuition');
+
+-------------------- Question 20 --------------------
+SELECT MIN(horaire) FROM Apparition WHERE idPokemon = (SELECT id FROM Pokemon WHERE nom = 'Tygnon');
+
+-------------------- Question 21 --------------------
+SELECT pseudonyme FROM Joueur WHERE idEquipe IN (SELECT idEquipe FROM Defense WHERE idArene = (SELECT id FROM Arene WHERE nom = 'Lune'));
+
+-------------------- Question 22 --------------------
+SELECT idJoueur, COUNT(id) FROM Pokemon GROUP BY idJoueur;
+
+-------------------- Question 23 --------------------
+SELECT espece, AVG(pointCombat) FROM Pokemon GROUP BY espece ORDER BY espece ASC;
+
+-------------------- Question 24 --------------------
+SELECT Joueur.pseudonyme, Equipe.nom, COUNT(Pokemon.id) FROM Joueur LEFT JOIN Equipe ON Joueur.idEquipe = Equipe.id LEFT JOIN Pokemon ON Joueur.pseudonyme = Pokemon.idJoueur GROUP BY Joueur.pseudonyme, Equipe.nom;
+
+-------------------- Question 25 --------------------
+SELECT Pokemon.nom, SUM(Apparition.duree) FROM Pokemon LEFT JOIN Apparition ON Pokemon.id = Apparition.idPokemon GROUP BY Pokemon.nom;
+
+-------------------- Question 26 --------------------
+SELECT Arene.nom, MAX(Defense.dateControle) FROM Arene LEFT JOIN Defense ON Defense.idArene = Arene.id GROUP BY Arene.nom; 
+
+-------------------- Question 27 --------------------
+SELECT Pokemon.nom, Pokemon.espece, COUNT(Apparition.horaire) AS "nb Apparitions" FROM Pokemon LEFT JOIN Apparition ON Pokemon.id = Apparition.idPokemon GROUP BY Pokemon.nom, Pokemon.espece HAVING COUNT(Apparition.horaire) > 1;
+
+-------------------- Question 28 --------------------
+SELECT Pokemon.nom, Pokemon.espece, COUNT(Apparition.horaire) AS "nb Apparitions" FROM Pokemon LEFT JOIN Apparition ON Pokemon.id = Apparition.idPokemon WHERE Apparition.duree > 4 GROUP BY Pokemon.nom, Pokemon.espece;
+
